@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maafin Aku Ya? 🥺</title>
+    <!-- Import Font Quicksand -->
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* === RESET & VARIABEL WARNA === */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Quicksand', sans-serif;
+        }
+
+        :root {
+            --pink-light: #FFE6EA;
+            --pink-main: #FFB6C1;
+            --pink-dark: #FF69B4;
+            --white: #FFFFFF;
+            --text-color: #5A3A40;
+        }
+
+        /* === BACKGROUND & LAYOUT UTAMA === */
+        body {
+            background: linear-gradient(135deg, var(--pink-light) 0%, var(--white) 50%, var(--pink-light) 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden; /* Mencegah scrollbar muncul saat tombol kabur atau hati melayang */
+            text-align: center;
+            position: relative;
+        }
+
+        /* === ANIMASI HATI MELAYANG (BACKGROUND) === */
+        .hearts-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .heart {
+            position: absolute;
+            bottom: -20px;
+            color: var(--pink-main);
+            font-size: 20px;
+            animation: floatUp 5s linear infinite;
+            opacity: 0.7;
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(0) scale(1); opacity: 0; }
+            20% { opacity: 0.8; }
+            100% { transform: translateY(-100vh) scale(1.5); opacity: 0; }
+        }
+
+        /* === KONTEN UTAMA === */
+        .content {
+            z-index: 10;
+            padding: 20px;
+            max-width: 500px;
+        }
+
+        h1 {
+            color: var(--pink-dark);
+            font-size: 2.2rem;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(255, 105, 180, 0.2);
+        }
+
+        /* GANTI LINK GAMBAR DI SINI */
+        .main-gif {
+            width: 250px;
+            height: auto;
+            border-radius: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+        }
+
+        /* === PEMUTAR MUSIK === */
+        .music-btn {
+            background-color: var(--white);
+            color: var(--pink-dark);
+            border: 2px solid var(--pink-main);
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            margin-bottom: 30px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(255, 182, 193, 0.3);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .music-btn:hover {
+            transform: scale(1.05);
+            background-color: var(--pink-light);
+        }
+
+        .music-btn.playing {
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); box-shadow: 0 0 15px var(--pink-main); }
+            100% { transform: scale(1); }
+        }
+
+        /* === TOMBOL PILIHAN === */
+        .buttons-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            position: relative;
+            height: 60px; /* Menjaga layout tidak loncat saat tombol No kabur */
+        }
+
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            cursor: pointer;
+            color: var(--white);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+            transition: transform 0.2s;
+        }
+
+        .btn-yes {
+            background-color: var(--pink-dark);
+            animation: bounce 2s infinite;
+            z-index: 15;
+        }
+
+        .btn-no {
+            background-color: #A9A9A9; /* Warna abu-abu agar kurang menarik */
+            position: relative;
+            transition: top 0.2s ease, left 0.2s ease; /* Transisi mulus saat kabur */
+            z-index: 20;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-15px); }
+            60% { transform: translateY(-7px); }
+        }
+
+        /* === POP-UP MODAL === */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .modal-content {
+            background: var(--white);
+            padding: 40px 30px;
+            border-radius: 30px;
+            border: 8px solid var(--pink-main);
+            text-align: center;
+            max-width: 90%;
+            width: 400px;
+            transform: scale(0.7);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-content h2 {
+            color: var(--pink-dark);
+            font-size: 1.8rem;
+            margin: 15px 0;
+        }
+
+        /* GANTI LINK GAMBAR MODAL DI SINI */
+        .modal-gif {
+            width: 200px;
+            border-radius: 15px;
+        }
+
+        .btn-close {
+            background-color: var(--pink-main);
+            color: var(--white);
+            border: none;
+            padding: 10px 25px;
+            border-radius: 20px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-top: 15px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        /* Responsif untuk HP */
+        @media (max-width: 480px) {
+            h1 { font-size: 1.8rem; }
+            .btn { font-size: 1rem; padding: 12px 24px; }
+            .main-gif { width: 200px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Background Animasi Hati -->
+    <div class="hearts-container" id="hearts-container"></div>
+
+    <!-- AUDIO PLAYER HIDDEN -->
+    <!-- GANTI LINK LAGU MP3 DI BAGIAN 'src' -->
+    <audio id="bgm" loop>
+        <source src="tulus/Teman_Hidup.mp3" type="audio/mpeg">
+    </audio>
+
+    <div class="content">
+        <!-- TEKS PEMBUKA (Silakan Edit) -->
+        <h1>Halo Sayangku... <br> Maafin aku ya,Rea Sayangg? 🥺</h1>
+
+        <!-- GAMBAR/GIF UTAMA (Silakan Edit src-nya) -->
+        <!-- Rekomendasi: Cari GIF Quby/Pentol menangis di tenor.com -->
+        <img class="main-gif" src="tulus/nailong-yellow-dragon.gif" alt="Crying Character">
+
+        <br>
+
+        <!-- TOMBOL MUSIK -->
+        <button class="music-btn" id="music-btn">
+            ❤️ Klik untuk dengerin lagu kita 🎶
+        </button>
+
+        <!-- TOMBOL PILIHAN -->
+        <div class="buttons-container">
+            <button class="btn btn-yes" id="btn-yes">Iya, Aku Maafin 💖</button>
+            <button class="btn btn-no" id="btn-no">Gak Mau! 😤</button>
+        </div>
+    </div>
+
+    <!-- POP-UP MODAL (Berhasil Dimaafkan) -->
+    <div class="modal-overlay" id="modal">
+        <div class="modal-content">
+            <!-- GAMBAR/GIF MODAL (Silakan Edit src-nya) -->
+            <!-- Rekomendasi: Cari GIF pelukan di tenor.com -->
+            <img class="modal-gif" src="https://media.tenor.com/9Y1m1k-kLh8AAAAj/tkthao219-bubududu.gif" alt="Hugging Character">
+            
+            <!-- TEKS MODAL (Silakan Edit) -->
+            <h2>Yeeey! Makasih sayangku! I love you so much! 🥰</h2>
+            
+            <button class="btn-close" id="btn-close">Cinii Cayang Peluk 🫂</button>
+        </div>
+    </div>
+
+    <script>
+        // === LOGIKA JAVASCRIPT ===
+
+        // 1. Membuat Background Hati Melayang secara Dinamis
+        const heartsContainer = document.getElementById('hearts-container');
+        function createHeart() {
+            const heart = document.createElement('div');
+            heart.classList.add('heart');
+            heart.innerHTML = Math.random() > 0.5 ? '🤍' : '🩷'; // Varian hati putih & pink
+            heart.style.left = Math.random() * 100 + 'vw';
+            heart.style.animationDuration = (Math.random() * 3 + 3) + 's'; // 3-6 detik
+            heartsContainer.appendChild(heart);
+            
+            // Hapus elemen setelah animasi selesai agar memori tidak penuh
+            setTimeout(() => {
+                heart.remove();
+            }, 6000);
+        }
+        setInterval(createHeart, 300); // Munculkan hati setiap 300ms
+
+        // 2. Fitur Background Music (BGM)
+        const musicBtn = document.getElementById('music-btn');
+        const bgm = document.getElementById('bgm');
+        let isPlaying = false;
+
+        musicBtn.addEventListener('click', () => {
+            if (isPlaying) {
+                bgm.pause();
+                musicBtn.classList.remove('playing');
+                musicBtn.innerHTML = '❤️ Klik untuk dengerin lagu kita 🎶';
+            } else {
+                bgm.play();
+                musicBtn.classList.add('playing');
+                musicBtn.innerHTML = '⏸️ Jeda Lagu';
+            }
+            isPlaying = !isPlaying;
+        });
+
+        // 3. Logika Tombol "Gak Mau!" (Berlari / Menghindar)
+        const btnNo = document.getElementById('btn-no');
+
+        // Fungsi kalkulasi posisi acak
+        const moveButton = () => {
+            // Ubah position jadi fixed agar bisa bebas bergerak di layar
+            btnNo.style.position = 'fixed';
+            
+            // Hitung ruang layar yang tersedia dikurangi ukuran tombol
+            const maxX = window.innerWidth - btnNo.offsetWidth - 20;
+            const maxY = window.innerHeight - btnNo.offsetHeight - 20;
+            
+            // Dapatkan posisi acak (hindari koordinat negatif)
+            const randomX = Math.max(10, Math.floor(Math.random() * maxX));
+            const randomY = Math.max(10, Math.floor(Math.random() * maxY));
+            
+            // Terapkan posisi baru
+            btnNo.style.left = randomX + 'px';
+            btnNo.style.top = randomY + 'px';
+        };
+
+        // Event listener untuk Laptop (Mouse Hover)
+        btnNo.addEventListener('mouseover', moveButton);
+        
+        // Event listener untuk HP (Layar Sentuh)
+        btnNo.addEventListener('touchstart', (e) => {
+            e.preventDefault(); // Mencegah tombol tidak sengaja terklik
+            moveButton();
+        });
+
+        // 4. Logika Pop-Up Modal (Berhasil Dimaafkan)
+        const btnYes = document.getElementById('btn-yes');
+        const modal = document.getElementById('modal');
+        const btnClose = document.getElementById('btn-close');
+
+        btnYes.addEventListener('click', () => {
+            modal.classList.add('active');
+            // Menambah efek hati meledak saat diterima
+            for(let i=0; i<30; i++){ setTimeout(createHeart, i*50); }
+        });
+
+        btnClose.addEventListener('click', () => {
+            modal.classList.remove('active');
+        });
+
+    </script>
+</body>
+</html>
